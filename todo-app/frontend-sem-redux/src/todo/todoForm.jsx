@@ -3,7 +3,7 @@ import Grid from '../template/grid';
 import IconButton from '../template/iconButton';
 
 export default props => {
-  const keyHandler = (e) => {
+  const keyHandler = e => {
     if (e.key === 'Enter') {
       e.shiftKey ? props.handleSearch() : props.handleAdd();
     } else if (e.key === 'Escape') {

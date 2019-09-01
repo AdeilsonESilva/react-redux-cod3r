@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import PageHeader from '../template/pageHeader';
@@ -7,78 +7,67 @@ import TodoList from './todoList';
 
 const URL = 'http://localhost:3003/api/todos';
 
-export default class Todo extends Component {
-  constructor (props) {
-    super(props);
-    this.state = { description: '', list: [] };
+export default () => {
+  const [description, setDescription] = useState('');
+  const [list, setList] = useState([]);
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleAdd = this.handleAdd.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
-    this.handleClear = this.handleClear.bind(this);
+  useEffect(() => refresh(), []);
 
-    this.handleMarkAsDone = this.handleMarkAsDone.bind(this);
-    this.handleMarkAsPending = this.handleMarkAsPending.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
-
-    this.refresh();
-  }
-
-  refresh (description = '') {
-    const search = description ? `&description__regex=/${description}/` : '';
+  const refresh = (paramDescription = '') => {
+    const search = paramDescription ? `&description__regex=/${paramDescription}/` : '';
     axios.get(`${URL}?sort=-createdAt${search}`)
-      .then(resp => this.setState({ ...this.state, description, list: resp.data }));
-  }
+      .then(resp => {
+        setDescription(paramDescription);
+        setList(resp.data);
+      });
+  };
 
-  handleSearch () {
-    this.refresh(this.state.description);
-  }
+  const handleSearch = () => {
+    refresh(description);
+  };
 
-  handleChange (e) {
-    this.setState({ ...this.state, description: e.target.value });
-  }
+  const handleChange = e => {
+    setDescription(e.target.value);
+  };
 
-  handleAdd () {
-    const description = this.state.description;
+  const handleAdd = () => {
     axios.post(URL, { description })
-      .then(resp => this.refresh());
-  }
+      .then(resp => refresh());
+  };
 
-  handleRemove (todo) {
+  const handleRemove = todo => {
     axios.delete(`${URL}/${todo._id}`)
-      .then(resp => this.refresh(this.state.description));
-  }
+      .then(resp => refresh(description));
+  };
 
-  handleMarkAsDone (todo) {
+  const handleMarkAsDone = todo => {
     axios.put(`${URL}/${todo._id}`, { ...todo, done: true })
-      .then(resp => this.refresh(this.state.description));
-  }
+      .then(resp => refresh(description));
+  };
 
-  handleMarkAsPending (todo) {
+  const handleMarkAsPending = todo => {
     axios.put(`${URL}/${todo._id}`, { ...todo, done: false })
-      .then(resp => this.refresh(this.state.description));
-  }
+      .then(resp => refresh(description));
+  };
 
-  handleClear () {
-    this.refresh();
-  }
+  const handleClear = () => {
+    refresh();
+  };
 
-  render () {
-    return (
-      <div>
-        <PageHeader name='Tarefas' small='Cadastro' />
-        <TodoForm
-          description={this.state.description}
-          handleChange={this.handleChange}
-          handleAdd={this.handleAdd}
-          handleSearch={this.handleSearch}
-          handleClear={this.handleClear} />
-        <TodoList
-          list={this.state.list}
-          handleMarkAsDone={this.handleMarkAsDone}
-          handleMarkAsPending={this.handleMarkAsPending}
-          handleRemove={this.handleRemove} />
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <PageHeader name='Tarefas' small='Cadastro' />
+      <TodoForm
+        description={description}
+        handleChange={handleChange}
+        handleAdd={handleAdd}
+        handleSearch={handleSearch}
+        handleClear={handleClear} />
+      <TodoList
+        list={list}
+        handleMarkAsDone={handleMarkAsDone}
+        handleMarkAsPending={handleMarkAsPending}
+        handleRemove={handleRemove} />
+    </div>
+  );
+};
