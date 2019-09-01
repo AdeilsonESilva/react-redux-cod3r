@@ -1,43 +1,36 @@
-import React, { useReducer } from 'react';
-import IconButton from '../template/iconButton';
-import todoReducer, { INICIAL_STATE } from '../todo/todoReducer';
+import React from 'react'
+import IconButton from '../template/iconButton'
 
-const TodoList = props => {
-  const [state] = useReducer(todoReducer, INICIAL_STATE);
+export default props => {
 
-  console.log('TodoList - state', state);
+    const renderRows = () => {
+        const list = props.list || []
+        return list.map(todo => (
+            <tr key={todo._id}>
+                <td className={todo.done ? 'markedAsDone' : ''}>{todo.description}</td>
+                <td>
+                    <IconButton style='success' icon='check' hide={todo.done}
+                        onClick={() => props.handleMarkAsDone(todo)}></IconButton>
+                    <IconButton style='warning' icon='undo' hide={!todo.done} 
+                        onClick={() => props.handleMarkAsPending(todo)}></IconButton>
+                    <IconButton style='danger' icon='trash-o' hide={!todo.done} 
+                        onClick={() => props.handleRemove(todo)}></IconButton>
+                </td>
+            </tr>
+        ))
+    }
 
-  const renderRows = () => {
-    console.log('renderRows - state.list :', state.list);
-
-    return props.list.map(todo => (
-      <tr key={todo._id}>
-        <td className={todo.done ? 'markedAsDone' : ''}>{todo.description}</td>
-        <td>
-          <IconButton style='success' icon='check' hide={todo.done}
-            onClick={() => props.handleMarkAsDone(todo)} />
-          <IconButton style='warning' icon='undo' hide={!todo.done}
-            onClick={() => props.handleMarkAsPending(todo)} />
-          <IconButton style='danger' icon='trash-o' hide={!todo.done}
-            onClick={() => props.handleRemove(todo)} />
-        </td>
-      </tr>
-    ));
-  };
-
-  return (
-    <table className='table'>
-      <thead>
-        <tr>
-          <th>Descrição</th>
-          <th className='tableActions'>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {renderRows()}
-      </tbody>
-    </table>
-  );
-};
-
-export default TodoList;
+    return (
+        <table className='table'>
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th className='tableActions'>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {renderRows()}
+            </tbody>
+        </table>
+    )
+}
