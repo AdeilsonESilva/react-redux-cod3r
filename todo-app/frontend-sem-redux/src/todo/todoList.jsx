@@ -3,7 +3,7 @@ import IconButton from '../template/iconButton';
 
 export default props => {
   const renderRows = () => {
-    const list = props.list || [];
+    const list = props.list;
     return list.map(todo => (
       <tr key={todo._id}>
         <td className={todo.done ? 'markedAsDone' : ''}>{todo.description}</td>
